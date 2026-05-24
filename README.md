@@ -1,18 +1,135 @@
-# Bilinéarisation de Courbe Pushover - Eurocode 8 (Vy = Vmax)
+# 🏗️ Pushover Bilinéarisation — Streamlit App
 
-Cette application web interactive permet de réaliser la bilinéarisation d'une courbe de pushover (force-déplacement) selon les dispositions de l'Eurocode 8, en utilisant l'approche d'équivalence d'énergie sous la contrainte $V_y = V_{max}$.
+Analyse et bilinéarisation de courbes pushover selon **Eurocode 8**.  
+Méthode : **Vy = Vmax**, égalité des énergies, écrouissage nul.
 
-## Fonctionnalités
+---
 
-*   **Import Excel direct** : Chargement de fichiers Excel (`.xlsx`, `.xls`) contenant les colonnes de déplacement (mm) et de force (kN).
-*   **Validation robuste** : Détection automatique des en-têtes et gestion des valeurs manquantes.
-*   **Lissage de signal** : Intégration des méthodes de lissage (Savitzky-Golay, moyenne mobile, spline).
-*   **Calculs techniques** : Évaluation automatique de $V_{max}$, $d_{max}$, $V_y$, $d_y$, de la rigidité initiale $K_e$ et de la ductilité $\mu$.
-*   **Visualisation conforme** : Génération d'un rapport graphique 2x2 identique à la version originale.
+## Aperçu
 
-## Installation locale
+L'application produit une figure 2×2 comprenant :
 
-1. Cloner le dépôt ou télécharger les fichiers :
+| Graphique | Contenu |
+|-----------|---------|
+| ↖ Haut gauche | Courbe brute + lissée + bilinéaire |
+| ↗ Haut droite | Zoom sur la transition élastique-plastique |
+| ↙ Bas gauche  | Comparaison des aires (égalité des énergies) |
+| ↘ Bas droite  | Courbe pushover avec zones remplies |
+
+---
+
+## Structure du projet
+
+```
+pushover_app/
+├── app.py              # Application Streamlit principale
+├── requirements.txt    # Dépendances Python
+└── README.md           # Ce fichier
+```
+
+---
+
+## Format du fichier Excel d'entrée
+
+Le fichier Excel doit contenir **exactement deux colonnes** :
+
+| Colonne 1            | Colonne 2   |
+|----------------------|-------------|
+| Déplacement (mm)     | Force (kN)  |
+
+- L'en-tête est **optionnel** : l'app le détecte automatiquement.
+- Les valeurs non numériques sont ignorées avec un avertissement.
+- Minimum **5 points** valides requis.
+
+Exemple :
+
+```
+Déplacement    Force
+0              0
+10             320
+50             1100
+120            1510
+140            1524
+200            1490
+270            1230
+```
+
+---
+
+## Lancer l'app en local
+
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/<votre-compte>/pushover-bilinearisation.git
+cd pushover-bilinearisation
+
+# 2. Créer un environnement virtuel (recommandé)
+python -m venv venv
+source venv/bin/activate        # Linux / macOS
+venv\Scripts\activate           # Windows
+
+# 3. Installer les dépendances
+pip install -r requirements.txt
+
+# 4. Lancer Streamlit
+streamlit run app.py
+```
+
+L'app s'ouvre automatiquement dans votre navigateur à `http://localhost:8501`.
+
+---
+
+## Déployer sur Streamlit Cloud
+
+1. **Pousser le projet sur GitHub** :
    ```bash
-   git clone https://github.com/votre-utilisateur/votre-depot.git
-   cd votre-depot
+   git init
+   git add .
+   git commit -m "Initial commit — pushover bilinearisation app"
+   git remote add origin https://github.com/<votre-compte>/pushover-bilinearisation.git
+   git push -u origin main
+   ```
+
+2. **Créer un compte** sur [streamlit.io/cloud](https://streamlit.io/cloud) (gratuit).
+
+3. **New app** → choisir le dépôt GitHub → branche `main` → fichier principal `app.py`.
+
+4. Cliquer **Deploy** — Streamlit Cloud installe automatiquement les dépendances via `requirements.txt`.
+
+> ℹ️ Aucune modification de code n'est nécessaire entre l'exécution locale et le déploiement Cloud.
+
+---
+
+## Paramètres disponibles (sidebar)
+
+| Paramètre        | Options                                      |
+|------------------|----------------------------------------------|
+| Lissage          | Activé / Désactivé                          |
+| Méthode lissage  | Savitzky-Golay · Moyenne mobile · Spline    |
+
+---
+
+## Résultats exportables
+
+- **PNG** : figure 2×2 haute résolution (150 dpi)  
+- **CSV** : tableau des résultats numériques (séparateur `;`, décimale `,`)
+
+---
+
+## Dépendances
+
+| Bibliothèque | Rôle |
+|--------------|------|
+| `streamlit`  | Interface web |
+| `numpy`      | Calculs numériques |
+| `pandas`     | Lecture Excel |
+| `matplotlib` | Graphiques |
+| `scipy`      | Lissage + optimisation |
+| `openpyxl`   | Lecture `.xlsx` |
+| `xlrd`       | Lecture `.xls` |
+
+---
+
+## Auteur
+
+Développé par **Yacine** — méthode de bilinéarisation conforme Eurocode 8.
